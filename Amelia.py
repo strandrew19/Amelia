@@ -1,0 +1,69 @@
+import pandas as pd
+import numpy as np 
+import os
+import pyreadr
+
+person_wd = os.getcwd() + "\\AMELIA_P_level_v0.2.3 (Person-Level)\\AMELIA_P_level_v0.2.3\\"
+age = pyreadr.read_r(person_wd + "PAML.AGE_v0.2.3.RData")
+BAS = pyreadr.read_r(person_wd + "PAML.BAS_v0.2.3.RData")
+CIT = pyreadr.read_r(person_wd + "PAML.CIT_v0.2.3.RData")
+COB = pyreadr.read_r(person_wd + "PAML.COB_v0.2.3.RData")
+DIS = pyreadr.read_r(person_wd + "PAML.DIS_v0.2.3.RData")
+DOU = pyreadr.read_r(person_wd + "PAML.DOU_v0.2.3.RData")
+EDI = pyreadr.read_r(person_wd + "PAML.EDI_v0.2.3.RData")
+EDU = pyreadr.read_r(person_wd + "PAML.EDU_v0.2.3.RData")
+HHS = pyreadr.read_r(person_wd + "PAML.HHS_v0.2.3.RData")
+HID = pyreadr.read_r(person_wd + "PAML.HID_v0.2.3.RData")
+INC = pyreadr.read_r(person_wd + "PAML.INC_v0.2.3.RData")
+ISCED = pyreadr.read_r(person_wd + "PAML.ISCED_v0.2.3.RData")
+PROV = pyreadr.read_r(person_wd + "PAML.PROV_v0.2.3.RData")
+PWHI = pyreadr.read_r(person_wd + "PAML.PWHI_v0.2.3.RData")
+PY010 = pyreadr.read_r(person_wd + "PAML.PY010_v0.2.3.RData")
+PY020 = pyreadr.read_r(person_wd + "PAML.PY020_v0.2.3.RData")
+PY050 = pyreadr.read_r(person_wd + "PAML.PY050_v0.2.3.RData")
+PY070 = pyreadr.read_r(person_wd + "PAML.PY070_v0.2.3.RData")
+PY090 = pyreadr.read_r(person_wd + "PAML.PY090_v0.2.3.RData")
+PY100 = pyreadr.read_r(person_wd + "PAML.PY100_v0.2.3.RData")
+PY110 = pyreadr.read_r(person_wd + "PAML.PY110_v0.2.3.RData")
+PY120 = pyreadr.read_r(person_wd + "PAML.PY120_v0.2.3.RData")
+PY130 = pyreadr.read_r(person_wd + "PAML.PY130_v0.2.3.RData")
+PY140 = pyreadr.read_r(person_wd + "PAML.PY140_v0.2.3.RData")
+REG = pyreadr.read_r(person_wd + "PAML.REG_v0.2.3.RData")
+RES = pyreadr.read_r(person_wd + "PAML.RES_v0.2.3.RData")
+SEM = pyreadr.read_r(person_wd + "PAML.SEM_v0.2.3.RData")
+SEX = pyreadr.read_r(person_wd + "PAML.SEX_v0.2.3.RData")
+SOC = pyreadr.read_r(person_wd + "PAML.SOC_v0.2.3.RData")
+SUP = pyreadr.read_r(person_wd + "PAML.SUP_v0.2.3.RData")
+UEP = pyreadr.read_r(person_wd + "PAML.UEP_v0.2.3.RData")
+
+df1 = age["AGE"]
+df1["Work_Status"] = BAS["BAS"]
+df1["City/Community"] = CIT["CIT"]
+df1["County_of_Birth"] = COB["COB"]
+df1["District"] = DIS["DIS"]
+df1["Degree_of_urbanisation"] = DOU["DOU"]
+df1["Equivalised_diposable_income(house-hold)"] = EDI["EDI"]
+df1["Current_Education_Activity"] = EDU["EDU"]
+df1["Household_size"] = HHS["HHS"]
+df1["Household_ID"] = HID["HID"]
+df1["Person_Income"] = INC["INC"]
+df1["Highest_ISCED"] = ISCED["ISCED"]
+df1["Province"] = PROV["PROV"]
+df1["Highest_Income_person"] = PWHI["PWHI"]
+df1["Cash_Income"] = PY010["PY010"]
+df1["Non-Cash_Employee"] = PY020["PY020"]
+df1["Cash_Benefits_or_SE_loss"] = PY050["PY050"]
+df1["Goods_Value_Produced_For_Own_Consumption"] = PY070["PY070"]
+df1["Unemployment_Benfits"] = PY090["PY090"]
+df1["Old-Age_Benefits"] = PY100["PY100"]
+df1["Survivor_Benefits"] = PY110["PY110"]
+df1["Sickness_Benefits"] = PY120["PY120"]
+df1["Disability_Benefits"] = PY130["PY130"]
+df1["Education-Related_Allowances"] = PY140["PY140"]
+df1["Regional_ID"] = REG["REG"]
+df1["Residential Status"] = RES["RES"]
+df1["Self_Employment_Dummy"] = SEM["SEM"]
+df1["Sex"] = SEX["SEX"]
+df1["Social_Income"] = SOC["SOC"]
+df1["Managerial_Position"] = SUP["SUP"]
+df1["Unemployment_Profile"] = UEP["UEP"]
