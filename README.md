@@ -9,6 +9,6 @@ The goals of this research case study are to
 
 All in all, the process model will look like this: 
 
-![](https://github.com/daaawit/Amelia/blob/main/media/Process%20model.png)
+![Process model illustrating the intended work flow.](/media/readme_proc_model.png)
 
 We will be using the AMELIA dataset and perform an income prediction with the goal of determining poverty rates. AMELIA is an open source data set provided by the University of Trier. To access the dataset visit http://amelia.uni-trier.de/?p=287.
