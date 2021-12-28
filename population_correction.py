@@ -3,7 +3,8 @@ import pyreadr
 import pandas as pd
 from tqdm import tqdm
 
-person_wd = r"C:\Users\David\Documents\Uni\02 Data Science\03 Wise 21-22\Research Case Studies\AMELIA\AMELIA_P_level_v0.2.3"
+person_wd = os.getcwd() + "\\AMELIA\\AMELIA_P_level_v0.2.3 (Person-Level)\\AMELIA_P_level_v0.2.3\\"
+# person_wd = r"C:\Users\David\Documents\Uni\02 Data Science\03 Wise 21-22\Research Case Studies\AMELIA\AMELIA_P_level_v0.2.3"
 print(person_wd)
 
 AMELIA = pd.DataFrame()
