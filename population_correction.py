@@ -119,4 +119,14 @@ print(Trimmed_Age.groupby(["City/Community", "Province", 'District']).size().res
 
 # Export to CSV file
 print("### Exporting ###")
-Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
+
+write_csv = False
+if write_csv:
+    Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
+
+# Export to Feather for faster R import
+# Source: https://stackoverflow.com/questions/24094476/python-pandas-to-r-dataframe
+
+# NOTE: This requires feather: pip-install feather-format as well as pandas >= v0.20.0
+
+Trimmed_Age.reset_index().to_feather(person_wd + "AMELIA.feather") # Index reset is requirement for export
