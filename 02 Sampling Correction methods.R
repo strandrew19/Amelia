@@ -1,4 +1,5 @@
 library(arrow)
+library(UBL)
 source("functions/relevance_function.R")
 
 ##### Get reference values (i.e. 'true' population values) ##### 
@@ -6,7 +7,7 @@ source("functions/relevance_function.R")
 amelia_full_income <- read_feather("data/AMELIA.feather")$Person_Income
 
 # Set bucket size for comparison between values 
-bucket_size <- 2000
+bucket_size <- 5000
 formals(get_bucket_dist)$bucket_size <- bucket_size
 formals(compute_income_diff)$bucket_size <- bucket_size
 
@@ -20,7 +21,13 @@ formals(compute_income_diff)$amelia_income_dist <- amelia_bucket_dist
 ##### Examplary sample #####
 set.seed(10)
 
-sample_size <- 1000
+sample_size <- 100
 ex_sample <- sample(amelia_full_income, size = sample_size, replace = F)
 
-bla <- compute_income_diff(ex_sample, amelia_bucket_dist, bucket_size)
+{
+  source("functions/relevance_function.R")
+  formals(get_bucket_dist)$bucket_size <- bucket_size
+  formals(compute_income_diff)$bucket_size <- bucket_size
+  formals(compute_income_diff)$amelia_income_dist <- amelia_bucket_dist
+  bla <- compute_income_diff(ex_sample, amelia_bucket_dist, bucket_size, label_distance = 10)
+}
