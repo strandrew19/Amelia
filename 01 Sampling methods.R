@@ -1,10 +1,18 @@
 require(dplyr)
-require(arrow) 
+require(arrow)
 require(splitstackshape)
 library(stringr)
 
 setwd("~/Uni/02 Data Science/03 Wise 21-22/Research Case Studies/Code/Amelia")
 Amelia <- read_feather("data/Amelia.feather")
+
+# Remove any values that contain NA (important for sample correction methods)
+pre <- nrow(Amelia)
+Amelia <- Amelia[complete.cases(Amelia), ]
+print(sprintf("Removed %d rows containing NA values", pre - nrow(Amelia)))
+
+# Convert strings to factors (important for sample correction methods)
+Amelia <- as_tibble(unclass(Amelia), stringsAsFactors = T)
 
 #Set Sample Size
 N <- 100000
