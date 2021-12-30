@@ -4,8 +4,11 @@ import pandas as pd
 from tqdm import tqdm
 
 person_wd = os.getcwd() + "\\AMELIA\\AMELIA_P_level_v0.2.3 (Person-Level)\\AMELIA_P_level_v0.2.3\\"
+<<<<<<< HEAD
 # person_wd = r"C:\Users\David\Documents\Uni\02 Data Science\03 Wise 21-22\Research Case Studies\AMELIA\AMELIA_P_level_v0.2.3"
 print(person_wd)
+=======
+>>>>>>> 382c9454c8f38ce05995d2923a1ac2178346ab96
 
 AMELIA = pd.DataFrame()
 
@@ -120,6 +123,7 @@ print(Trimmed_Age.groupby(["City/Community", "Province", 'District']).size().res
 
 # Export to CSV file
 print("### Exporting ###")
+<<<<<<< HEAD
 
 write_csv = False
 if write_csv:
@@ -131,3 +135,6 @@ if write_csv:
 # NOTE: This requires feather: pip-install feather-format as well as pandas >= v0.20.0
 
 Trimmed_Age.reset_index().to_feather(person_wd + "AMELIA.feather") # Index reset is requirement for export
+=======
+Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
+>>>>>>> 382c9454c8f38ce05995d2923a1ac2178346ab96
