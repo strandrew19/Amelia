@@ -28,7 +28,7 @@ get_bucket_dist <- function(x, bucket_size, max_val = 1034300){
   return(list("dist_val" = dist_val, "dist_prop" = dist_prop))
 }
 
-plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, padding, show_mean, show_median){
+plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance){
   #' This function is used to show the difference in income between the sample and the 
   #' actual distribution in the AMELIA dataset.
   #' 
@@ -40,6 +40,7 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
   #'   - padding: By how much the relevance function has been padded (i.e. by how much the min/max differ from [0,1])
   #'   - show_mean: Whether mean should be plotted as a horizontal line
   #'   - show_median: Whether median should be plotted as a horizontal line
+  #'   - sample_type: Implemented sampling method, gets added to the title if not null
   #' 
   #' OUTPUT
   #'   - Histogram of density of distributions + plot of difference
@@ -84,23 +85,28 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
   
   # Adding the plot for the relevance function. This is done in single segments, which is pretty slow.
   
-  for (i in 1:length(labels)){
-    plot <- plot + 
-      geom_segment(x = i-0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
-  }
-  
-  for (i in 1:length(labels)){
-    if (i < length(labels)){
+  if (plot_relevance){
+    for (i in 1:length(labels)){
       plot <- plot + 
-        geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i+1])
-    } else {
-      plot <- plot + 
-        geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
+        geom_segment(x = i-0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
     }
+    
+    for (i in 1:length(labels)){
+      if (i < length(labels)){
+        plot <- plot + 
+          geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i+1])
+      } else {
+        plot <- plot + 
+          geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
+      }
+      
+    }
+    
     
   }
   
   color <- c("Relevance Function" = "#3634CA")
+  
   
   # Mean / Median
   if (show_mean){
@@ -116,19 +122,25 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
   
   ### Theme ###
   
-  title = "Income distribution in sample and true population with resulting relevance function"
+  if (!is.null(sample_type)){
+    title <- sprintf("Income distribution in %s sample and true population with resulting relevance function", sample_type)
+  } else {
+    title <- "Income distribution in sample and true population with resulting relevance function"
+  }
   
-  if (padding != 0) subtitle = sprintf("Relevance function with padding of %s has been scaled to range between 0 and maximum density value", padding)
-  else subtitle = "Relevance function has been scaled to range between 0 and maximum density value"
+  
+  if (padding != 0) subtitle <- sprintf("Relevance function with padding of %s has been scaled to range between 0 and maximum density value", padding)
+  else subtitle <- "Relevance function has been scaled to range between 0 and maximum density value"
   
   
   plot <- plot +
     guides(fill = guide_legend(title=NULL), color = guide_legend(title=NULL)) +
     scale_x_discrete(labels = labels) + 
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+          axis.line = element_line(size = 0.2, colour = "black", linetype=1)) + 
     ggtitle(label = title,
             subtitle = subtitle) +
-    labs(x = "Income", y = "Density")
+    labs(x = "Income", y = "Density") 
     
   
   print(plot)
@@ -137,7 +149,7 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
 
 compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
                                 padding = 0, damp = "pop",
-                                plot = T, label_distance = 10, show_mean = F, show_median = F){
+                                plot = F, label_distance = 10, show_mean = F, show_median = F, sample_type = NULL, plot_relevance = F){
   #' This function is a wrapper for all the other function in this file. Note that we use the 'dist_prop'
   #' attribute for the difference as this is a measure that has been adjusted by the sample size. If 
   #' we were to use absolute values, we wouldn't get relevant results as the N for AMELIA is too large.
@@ -160,6 +172,7 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size,
   #'   - label_distance     = Distance between labels, only used for plotting
   #'   - show_mean          = Whether the (scaled) mean should be shown in the plot as a threshold
   #'   - show_median        = Whether the (scaled) median should be shown in the plot as a threshold
+  #'   - sample_type        = Sampling method used, only used for the title of the plot
   #'   
   #' 
   #' OUTPUT
@@ -210,7 +223,7 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size,
     "relevance_threshold" = list("mean" = threshold_mean,
                                  "median" = threshold_med))
   
-  if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, padding, show_mean, show_median)
+  if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance)
   
   return(all_vals)
 }
