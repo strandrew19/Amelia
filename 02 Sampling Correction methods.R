@@ -2,6 +2,7 @@
 
 amelia_full_income <- arrow::read_feather("~/Uni/02 Data Science/03 Wise 21-22/Research Case Studies/Code/Amelia/data/AMELIA.feather")$Person_Income
 
+setwd("~/Uni/02 Data Science/03 Wise 21-22/Research Case Studies/Code/Amelia/")
 library(dplyr)
 library(UBL)
 library(stringr)
@@ -11,7 +12,7 @@ source("functions/relevance_function.R")
 
 
 # Set bucket size for comparison between values 
-BUCKET_SIZE <- 4000
+BUCKET_SIZE <- 20000
 formals(compute_income_diff)$bucket_size <- BUCKET_SIZE # Set as global preset
 
 # Get maximum income 
@@ -54,9 +55,9 @@ compute_income_diff(imp_samp$Person_Income, plot = T)
 
 smote <- SmoteRegress(form = REGRESSION_FORMULA,
              dat = resample_data,
-             dist = "HEOM", 
+             dist = "HEOM",
              rel = sample_difference$relevance_matrix_ubl,
-             k = 5)
+             k = 2)
 
 compute_income_diff(smote$Person_Income, plot = T)
 

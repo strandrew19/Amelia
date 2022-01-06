@@ -222,13 +222,20 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   names(relevance_scaled) <- names(sample_income_dist$dist_prop)
   
   # Create matrix for UBL functions 
-  relevance_deriv_per_bucket <- rep(0, times = length(buckets)-1)
+  # Shape: x, phi(x), phi'(x)
+
+  # To get phi'(x): Spline interpolation and get first derivative
+  fun <- splinefun(x = buckets[1:length(buckets)-1], y = as.numeric(relevance_scaled))
+  
+  
+  relevance_deriv_per_bucket <- fun(x = buckets[1:length(buckets)-1], deriv = 1)
   
   relevance_matrix_ubl <- matrix(
     cbind(
       buckets[1:length(buckets)-1] + 1/2 * bucket_size, # Mean of each bucket as sampling point 
       as.numeric(relevance_scaled), 
-      relevance_deriv_per_bucket), ncol = 3)
+      relevance_deriv_per_bucket), 
+    ncol = 3)
   
   
   
