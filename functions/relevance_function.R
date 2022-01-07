@@ -146,7 +146,7 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance)
   
   squared_deviation <- sum(as.numeric(diff_prop)^2)
-  print(sprintf("Squared deviation: %.6f", squared_deviation))
+  print(sprintf("Squared deviation sum: %.6f", squared_deviation))
   
   return(all_vals)
 }

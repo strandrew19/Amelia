@@ -8,7 +8,7 @@ library(UBL)
 library(stringr)
 source("functions/relevance_function.R")
 source("functions/sampling_correction.R")
-source("relevance_function_plot.R")
+source("functions/relevance_function_plot.R")
 
 ##### Get reference values (i.e. 'true' population values) ##### 
 
@@ -31,7 +31,6 @@ formals(compute_income_diff)$amelia_income_dist <- AMELIA_BUCKET_INCOME # Set as
 # 
 # SAMPLING_METHODS <- c("SRS", "Stratified", "Stratified Cluster")
 
-
 ex_sample <- readRDS("data/samples/03_sample.rds")
 ex_sample$SRS$Base$Sex <- as.factor(ex_sample$SRS$Base$Sex)
 
@@ -48,20 +47,7 @@ resample_data <- ex_sample$SRS$Base
 
 ### Relevance function must be supplied as a matrix of form y, phi(y), phi'(y)
 
-imp_samp <- WERCSRegress(
-  form = REGRESSION_FORMULA, 
-  dat = resample_data,
-  rel = sample_difference$relevance_matrix_ubl)
 
-compute_income_diff(imp_samp$Person_Income, plot = T)
-
-smote <- SmoteRegress(form = REGRESSION_FORMULA,
-             dat = resample_data,
-             dist = "HEOM",
-             rel = sample_difference$relevance_matrix_ubl,
-             k = 2)
-
-compute_income_diff(smote$Person_Income, plot = T)
 
 #### Simulation #### 
 
