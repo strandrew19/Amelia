@@ -1,12 +1,14 @@
 # Read data first as RStudio gets stuck on read_feather command otherwise
+wd <- dirname(rstudioapi::getSourceEditorContext()$path)
+amelia_full_income <- arrow::read_feather(sprintf("%s/data/AMELIA.feather", wd))$Person_Income
 
-amelia_full_income <- arrow::read_feather("~/Uni/02 Data Science/03 Wise 21-22/Research Case Studies/Code/Amelia/data/AMELIA.feather")$Person_Income
-
-setwd("~/Uni/02 Data Science/03 Wise 21-22/Research Case Studies/Code/Amelia/")
+setwd(wd)
 library(dplyr)
 library(UBL)
 library(stringr)
 source("functions/relevance_function.R")
+source("functions/sampling_correction.R")
+source("relevance_function_plot.R")
 
 ##### Get reference values (i.e. 'true' population values) ##### 
 

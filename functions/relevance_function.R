@@ -31,125 +31,6 @@ get_bucket_dist <- function(x, buckets, AMELIA = F, max_val = NULL, bucket_size 
   return(list("dist_val" = dist_val, "dist_prop" = dist_prop))
 }
 
-plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance){
-  #' This function is used to show the difference in income between the sample and the 
-  #' actual distribution in the AMELIA dataset.
-  #' 
-  #' INPUT
-  #'   - sample_data: Output value of compute_income_diff()
-  #'   - amelia: Income distribution of original AMELIA dataset with bucket size 
-  #'   - bucket_size: Size of buckets, used for binwith
-  #'   - label_distance: Each i-th label will be displayed in the plot
-  #'   - padding: By how much the relevance function has been padded (i.e. by how much the min/max differ from [0,1])
-  #'   - show_mean: Whether mean should be plotted as a horizontal line
-  #'   - show_median: Whether median should be plotted as a horizontal line
-  #'   - sample_type: Implemented sampling method, gets added to the title if not null
-  #' 
-  #' OUTPUT
-  #'   - Histogram of density of distributions + plot of difference
-  #'   
-  
-  plot_data <- data.frame(
-    "sample_dist" = as.numeric(sample_data$dist_prop), 
-    "amelia_dist" = as.numeric(amelia$dist_prop),
-    "diff" = as.numeric(sample_data$scaled_relevance_table))
-  
-  # Plot colors
-  fills <- c("Sample population" = "#EE6123", "True population" = "#36BFAA")
-  
-  
-  plot_data$names <- factor(names(sample_data$dist_prop), levels = names(sample_data$dist_prop))
-  
-  # Plot labels 
-  labels <- rep("", times = nrow(plot_data))
-  
-  for (i in 1:length(labels)){
-    if ((i-1) %% label_distance == 0) labels[i] <- attributes(plot_data$names)$levels[i]
-  }
-  
-  ### Base plot (distributions) ###
-  
-  plot <- ggplot(data = plot_data, aes(x = names, width = 1)) + 
-    geom_col(aes(y = sample_dist, fill = "Sample population")) +
-    geom_col(aes(y = amelia_dist, fill = "True population"), alpha = 0.4) +
-    scale_fill_manual(values = fills)
-  
-  
-  ### Relevance function ### 
-  
-  # Rescale difference of relevance function to fit frame
-  absolute_max <- max(max(plot_data$sample_dist), max(plot_data$amelia_dist))
-  padding_scaled <- padding * absolute_max
-  
-  max_val <- absolute_max - padding_scaled
-  min_val <- 0 + padding_scaled
-  
-  plot_data$diff <- rescale(plot_data$diff, to = c(min_val, max_val))
-  
-  # Adding the plot for the relevance function. This is done in single segments, which is pretty slow.
-  
-  if (plot_relevance){
-    for (i in 1:length(labels)){
-      plot <- plot + 
-        geom_segment(x = i-0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
-    }
-    
-    for (i in 1:length(labels)){
-      if (i < length(labels)){
-        plot <- plot + 
-          geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i+1])
-      } else {
-        plot <- plot + 
-          geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
-      }
-      
-    }
-    
-    
-  }
-  
-  color <- c("Relevance Function" = "#3634CA")
-  
-  
-  # Mean / Median
-  if (show_mean){
-    plot <- plot + geom_hline(aes(yintercept = mean(plot_data$diff), color = "Mean"), lty = "dashed")
-    color <- c(color, "Mean" = "#018D43")
-  }   
-  if (show_median){
-    plot <- plot + geom_hline(aes(yintercept = median(plot_data$diff), color = "Median"), lty = "dashed")
-    color <- c(color, "Median" = "#785889")
-  } 
-  
-  plot <- plot + scale_color_manual(values = color)
-  
-  ### Theme ###
-  
-  if (!is.null(sample_type)){
-    title <- sprintf("Income distribution in %s sample and true population with resulting relevance function", sample_type)
-  } else {
-    title <- "Income distribution in sample and true population with resulting relevance function"
-  }
-  
-  
-  if (padding != 0) subtitle <- sprintf("Relevance function with padding of %s has been scaled to range between 0 and maximum density value", padding)
-  else subtitle <- "Relevance function has been scaled to range between 0 and maximum density value"
-  
-  
-  plot <- plot +
-    guides(fill = guide_legend(title=NULL), color = guide_legend(title=NULL)) +
-    scale_x_discrete(labels = labels) + 
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
-          axis.line = element_line(size = 0.2, colour = "black", linetype=1)) + 
-    ggtitle(label = title,
-            subtitle = subtitle) +
-    labs(x = "Income", y = "Density") 
-    
-  
-  print(plot)
-}
-
-
 compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, max_val, 
                                 padding = 0, damp = "pop",
                                 plot = F, label_distance = 10, show_mean = F, show_median = F, sample_type = NULL, plot_relevance = F){
@@ -183,12 +64,14 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   #' OUTPUT
   #'   - List consisting of the difference between the 'true' income in buckets and the sampled
   #'     income in buckets in three forms:
+  #'     - buckets                 = Buckets for given bucket_size
   #'     - dist_val                = Absolute # of people in sample per bucket
   #'     - dist_prop               = Proportion of people in sample per bucket
-  #'     - difference_table        = Difference in table form (used for analysis of sampling methods)
+  #'     - difference_table_abs    = Difference in table form (absolute values)
+  #'     - difference_table_prop   = Difference in table form (used for analysis of sampling methods)
   #'     - scaled_difference_table = Difference table with scaled values 
   #'     - relevance_table         = Difference in table form with dampening to counteract group size
-  #'     - scaled_relevance_table  = Relevance table with scaled values
+  #'     - scaled_relevance_table  = Relevance table with scaled values 
   #'     - relevance_matrix_ubl    = Relevance in correct form for functions in UBL package
   #'     - relevance_threshold     = Suggested threshold values for relevance function. Contains mean and
   #'                                 median of the scaled relevance function as a list.
@@ -207,9 +90,10 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
     dampening <- 1 - amelia_income_dist$dist_prop
   }
   
-  diff <- (amelia_income_dist$dist_prop - sample_income_dist$dist_prop)
-  diff_numeric <- as.numeric(diff)
-  relevance <- diff * dampening
+  diff_abs <- (amelia_income_dist$dist_val - sample_income_dist$dist_val)
+  diff_prop <- (amelia_income_dist$dist_prop - sample_income_dist$dist_prop)
+  diff_numeric <- as.numeric(diff_prop)
+  relevance <- diff_prop * dampening
   
   # Apply rescaling as UBL relevance function ~ [0,1] and convert back to table
   min <- 0 + padding
@@ -233,7 +117,7 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   relevance_matrix_ubl <- matrix(
     cbind(
       buckets[1:length(buckets)-1] + 1/2 * bucket_size, # Mean of each bucket as sampling point 
-      as.numeric(relevance_scaled), 
+      as.numeric(relevance_scaled) * (1- as.numeric(relevance_scaled)), 
       relevance_deriv_per_bucket), 
     ncol = 3)
   
@@ -244,9 +128,11 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   threshold_med <- median(as.numeric(relevance_scaled))
   
   all_vals <- list(
+    "buckets" = buckets,
     "dist_val" = sample_income_dist$dist_val,
     "dist_prop" = sample_income_dist$dist_prop,
-    "difference_table" = diff, 
+    "difference_table_abs" = diff_abs,
+    "difference_table_prop" = diff_prop, 
     "scaled_difference_table" = diff_scaled,
     "relevance_table" = relevance, 
     "scaled_relevance_table" = relevance_scaled,
