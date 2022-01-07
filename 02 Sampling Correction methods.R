@@ -33,7 +33,7 @@ formals(compute_income_diff)$amelia_income_dist <- AMELIA_BUCKET_INCOME # Set as
 ex_sample <- readRDS("data/samples/03_sample.rds")
 ex_sample$SRS$Base$Sex <- as.factor(ex_sample$SRS$Base$Sex)
 
-sample_difference <- compute_income_diff(ex_sample$SRS$Base$Person_Income, plot = T, plot_relevance = T)
+sample_difference <- compute_income_diff(ex_sample$`Stratified Cluster`$Base$Person_Income, plot = T, plot_relevance = T)
 
 #### Importance sampling ####  
 
