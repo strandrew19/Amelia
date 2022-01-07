@@ -1,4 +1,5 @@
 library(ggplot2)
+
 rescale <- scales::rescale
 
 get_bucket_dist <- function(x, buckets, AMELIA = F, max_val = NULL, bucket_size = NULL){
@@ -107,7 +108,7 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   
   # Create matrix for UBL functions 
   # Shape: x, phi(x), phi'(x)
-
+  
   # To get phi'(x): Spline interpolation and get first derivative
   fun <- splinefun(x = buckets[1:length(buckets)-1], y = as.numeric(relevance_scaled))
   
@@ -124,7 +125,8 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   
   
   # Suggested Threshold for relevance function: Median of relevance function
-  threshold_mean <- mean(as.numeric(relevance_scaled))
+  threshold_mean <- mean(as.numeric(relevance))
+  threshold_mean_scaled <- mean(as.numeric(relevance_scaled))
   threshold_med <- median(as.numeric(relevance_scaled))
   
   all_vals <- list(
@@ -138,9 +140,13 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
     "scaled_relevance_table" = relevance_scaled,
     "relevance_matrix_ubl" = relevance_matrix_ubl,
     "relevance_threshold" = list("mean" = threshold_mean,
+                                 "mean_scaled" = threshold_mean_scaled,
                                  "median" = threshold_med))
   
   if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance)
+  
+  squared_deviation <- sum(as.numeric(diff_prop)^2)
+  print(sprintf("Squared deviation: %.6f", squared_deviation))
   
   return(all_vals)
 }
