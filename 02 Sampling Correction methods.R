@@ -7,8 +7,9 @@ library(dplyr)
 library(UBL)
 library(stringr)
 source("functions/relevance_function.R")
-source("functions/sampling_correction.R")
+
 source("functions/relevance_function_plot.R")
+source("functions/sampling_correction.R")
 
 ##### Get reference values (i.e. 'true' population values) ##### 
 

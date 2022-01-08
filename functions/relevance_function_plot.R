@@ -1,4 +1,4 @@
-plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance){
+plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, show_mean, show_median, sample_type, plot_relevance){
   #' This function is used to show the difference in income between the sample and the 
   #' actual distribution in the AMELIA dataset.
   #' 
@@ -19,7 +19,7 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
   plot_data <- data.frame(
     "sample_dist" = as.numeric(sample_data$dist_prop), 
     "amelia_dist" = as.numeric(amelia$dist_prop),
-    "diff" = as.numeric(sample_data$scaled_relevance_table))
+    "diff" = as.numeric(sample_data$scaled_difference_table))
   
   # Plot colors
   fills <- c("Sample population" = "#EE6123", "True population" = "#36BFAA")
@@ -46,10 +46,9 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
   
   # Rescale difference of relevance function to fit frame
   absolute_max <- max(max(plot_data$sample_dist), max(plot_data$amelia_dist))
-  padding_scaled <- padding * absolute_max
   
-  max_val <- absolute_max - padding_scaled
-  min_val <- 0 + padding_scaled
+  max_val <- absolute_max
+  min_val <- 0
   
   plot_data$diff <- rescale(plot_data$diff, to = c(min_val, max_val))
   
@@ -98,9 +97,8 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
     title <- "Income distribution in sample and true population with resulting relevance function"
   }
   
-  
-  if (padding != 0) subtitle <- sprintf("Relevance function with padding of %s has been scaled to range between 0 and maximum density value", padding)
-  else subtitle <- "Relevance function has been scaled to range between 0 and maximum density value"
+  if(plot_relevance) subtitle <- "Difference has been scaled to range between 0 and maximum density value"
+  else subtitle <- NULL
   
   
   plot <- plot +

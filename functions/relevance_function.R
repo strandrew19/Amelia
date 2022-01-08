@@ -32,8 +32,7 @@ get_bucket_dist <- function(x, buckets, AMELIA = F, max_val = NULL, bucket_size 
   return(list("dist_val" = dist_val, "dist_prop" = dist_prop))
 }
 
-compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, max_val, 
-                                padding = 0, damp = "pop",
+compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, max_val,
                                 plot = F, label_distance = 10, show_mean = F, show_median = F, sample_type = NULL, plot_relevance = F){
   #' This function is a wrapper for all the other function in this file. Note that we use the 'dist_prop'
   #' attribute for the difference as this is a measure that has been adjusted by the sample size. If 
@@ -76,74 +75,34 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   #'     - relevance_matrix_ubl    = Relevance in correct form for functions in UBL package
   #'     - relevance_threshold     = Suggested threshold values for relevance function. Contains mean and
   #'                                 median of the scaled relevance function as a list.
-  
-  min <- 0
-  max <- max_val + bucket_size
-  
-  buckets <- seq(min, max, bucket_size)
+
+  buckets <- seq(0, max_val + bucket_size, bucket_size)
   
   sample_income_dist <- get_bucket_dist(sample_income, buckets = buckets)
-  
-  if (tolower(damp) == "pop") dampening <- 1 - amelia_income_dist$dist_prop
-  else if (tolower(damp) == "sample") dampening <- 1 - sample_income_dist$dist_prop
-  else{
-    message("Input for 'damp' must be either 'sample' or 'pop'. Defaulting to 'pop'.")
-    dampening <- 1 - amelia_income_dist$dist_prop
-  }
   
   diff_abs <- (amelia_income_dist$dist_val - sample_income_dist$dist_val)
   diff_prop <- (amelia_income_dist$dist_prop - sample_income_dist$dist_prop)
   diff_numeric <- as.numeric(diff_prop)
-  relevance <- diff_prop * dampening
   
   # Apply rescaling as UBL relevance function ~ [0,1] and convert back to table
-  min <- 0 + padding
-  max <- 1 - padding
-  
-  diff_scaled <- as.table(rescale(diff_numeric, to = c(min, max)))
-  relevance_scaled <- as.table(rescale(diff_numeric, to = c(min, max)))
-  
+  diff_scaled <- as.table(rescale(diff_numeric, to = c(0, 1)))
   names(diff_scaled) <- names(sample_income_dist$dist_prop)
-  names(relevance_scaled) <- names(sample_income_dist$dist_prop)
-  
-  # Create matrix for UBL functions 
-  # Shape: x, phi(x), phi'(x)
-  
-  # To get phi'(x): Spline interpolation and get first derivative
-  fun <- splinefun(x = buckets[1:length(buckets)-1], y = as.numeric(relevance_scaled))
-  
-  
-  relevance_deriv_per_bucket <- fun(x = buckets[1:length(buckets)-1], deriv = 1)
-  
-  relevance_matrix_ubl <- matrix(
-    cbind(
-      buckets[1:length(buckets)-1] + 1/2 * bucket_size, # Mean of each bucket as sampling point 
-      as.numeric(relevance_scaled) * (1- as.numeric(relevance_scaled)), 
-      relevance_deriv_per_bucket), 
-    ncol = 3)
-  
-  
   
   # Suggested Threshold for relevance function: Median of relevance function
-  threshold_mean <- mean(as.numeric(relevance))
-  threshold_mean_scaled <- mean(as.numeric(relevance_scaled))
-  threshold_med <- median(as.numeric(relevance_scaled))
+  threshold_mean <- mean(as.numeric(diff_scaled))
+  threshold_med <- median(as.numeric(diff_scaled))
   
   all_vals <- list(
     "buckets" = buckets,
     "dist_val" = sample_income_dist$dist_val,
     "dist_prop" = sample_income_dist$dist_prop,
-    "difference_table_abs" = diff_abs,
+    "difference_table_val" = diff_abs,
     "difference_table_prop" = diff_prop, 
-    "scaled_difference_table" = diff_scaled,
-    "relevance_table" = relevance, 
-    "scaled_relevance_table" = relevance_scaled,
-    "relevance_matrix_ubl" = relevance_matrix_ubl,
+    "difference_table_prop_scaled" = diff_scaled,
     "relevance_threshold" = list("mean" = threshold_mean,
-                                 "mean_scaled" = threshold_mean_scaled,
                                  "median" = threshold_med))
   
-  if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance)
+  if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, show_mean, show_median, sample_type, plot_relevance)
   
   squared_deviation <- sum(as.numeric(diff_prop)^2)
   print(sprintf("Squared deviation sum: %.6f", squared_deviation))
