@@ -19,7 +19,7 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, s
   plot_data <- data.frame(
     "sample_dist" = as.numeric(sample_data$dist_prop), 
     "amelia_dist" = as.numeric(amelia$dist_prop),
-    "diff" = as.numeric(sample_data$scaled_difference_table))
+    "diff" = as.numeric(sample_data$difference_table_prop_scaled))
   
   # Plot colors
   fills <- c("Sample population" = "#EE6123", "True population" = "#36BFAA")

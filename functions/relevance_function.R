@@ -33,7 +33,8 @@ get_bucket_dist <- function(x, buckets, AMELIA = F, max_val = NULL, bucket_size 
 }
 
 compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, max_val,
-                                plot = F, label_distance = 10, show_mean = F, show_median = F, sample_type = NULL, plot_relevance = F){
+                                plot = F, label_distance = 10, show_mean = F, show_median = F, sample_type = NULL, plot_relevance = F,
+                                return_full = T){
   #' This function is a wrapper for all the other function in this file. Note that we use the 'dist_prop'
   #' attribute for the difference as this is a measure that has been adjusted by the sample size. If 
   #' we were to use absolute values, we wouldn't get relevant results as the N for AMELIA is too large.
@@ -59,22 +60,24 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   #'   - show_mean          = Whether the (scaled) mean should be shown in the plot as a threshold
   #'   - show_median        = Whether the (scaled) median should be shown in the plot as a threshold
   #'   - sample_type        = Sampling method used, only used for the title of the plot
+  #'   - return_full        = Returns full list of deviations if TRUE, returns only squared deviation if FALSE
   #'   
   #' 
   #' OUTPUT
-  #'   - List consisting of the difference between the 'true' income in buckets and the sampled
-  #'     income in buckets in three forms:
-  #'     - buckets                 = Buckets for given bucket_size
-  #'     - dist_val                = Absolute # of people in sample per bucket
-  #'     - dist_prop               = Proportion of people in sample per bucket
-  #'     - difference_table_abs    = Difference in table form (absolute values)
-  #'     - difference_table_prop   = Difference in table form (used for analysis of sampling methods)
-  #'     - scaled_difference_table = Difference table with scaled values 
-  #'     - relevance_table         = Difference in table form with dampening to counteract group size
-  #'     - scaled_relevance_table  = Relevance table with scaled values 
-  #'     - relevance_matrix_ubl    = Relevance in correct form for functions in UBL package
-  #'     - relevance_threshold     = Suggested threshold values for relevance function. Contains mean and
-  #'                                 median of the scaled relevance function as a list.
+  #'   - If (return_full == TRUE)
+  #'     - List consisting of the difference between the 'true' income in buckets and the sampled
+  #'       income in buckets in three forms:
+  #'       - buckets                      = Buckets for given bucket_size
+  #'       - dist_val                     = Absolute # of people in sample per bucket
+  #'       - dist_prop                    = Proportion of people in sample per bucket
+  #'       - difference_table_abs         = Difference in table form (absolute values)
+  #'       - difference_table_prop        = Difference in table form (used for analysis of sampling methods)
+  #'       - difference_table_prop_scaled = Difference table with scaled values (range = 0,1)
+  #'       - squared_deviation            = Squared deviation of density per bucket in the sample and true 
+  #'                                        distribution
+  #'   - Else
+  #'       - squared_deviation            = Squared deviation of density per bucket in the sample and true 
+  #'                                        distribution
 
   buckets <- seq(0, max_val + bucket_size, bucket_size)
   
@@ -88,9 +91,7 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   diff_scaled <- as.table(rescale(diff_numeric, to = c(0, 1)))
   names(diff_scaled) <- names(sample_income_dist$dist_prop)
   
-  # Suggested Threshold for relevance function: Median of relevance function
-  threshold_mean <- mean(as.numeric(diff_scaled))
-  threshold_med <- median(as.numeric(diff_scaled))
+  squared_deviation <- sum(as.numeric(diff_prop)^2)
   
   all_vals <- list(
     "buckets" = buckets,
@@ -99,13 +100,11 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
     "difference_table_val" = diff_abs,
     "difference_table_prop" = diff_prop, 
     "difference_table_prop_scaled" = diff_scaled,
-    "relevance_threshold" = list("mean" = threshold_mean,
-                                 "median" = threshold_med))
+    "squared_deviation" = squared_deviation)
   
   if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, show_mean, show_median, sample_type, plot_relevance)
   
-  squared_deviation <- sum(as.numeric(diff_prop)^2)
-  print(sprintf("Squared deviation sum: %.6f", squared_deviation))
   
-  return(all_vals)
+  if(return_full) return(all_vals)
+  else return(squared_deviation)
 }
