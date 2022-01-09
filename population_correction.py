@@ -121,6 +121,12 @@ for k,v in Redistribution.items():
 #Check to ensure all Cities/Communities have been reassigned
 print(Trimmed_Age.groupby(["City/Community", "Province", 'District']).size().reset_index().rename(columns={0:"Count"}).head())
 
+#Create Holdout data
+Holdout = Trimmed_Age.sample(n = 20000, random_state = 420)
+
+#Remove Holdout data from Amelia Dataset
+Trimmed_Age = Trimmed_Age.drop(Holdout.index)
+
 # Export to CSV file
 print("### Exporting ###")
 <<<<<<< HEAD
@@ -128,6 +134,7 @@ print("### Exporting ###")
 write_csv = False
 if write_csv:
     Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
+    Holdout.to_csv(f"{person_wd}/Holdout_Amelia_Dataset.csv")
 
 # Export to Feather for faster R import
 # Source: https://stackoverflow.com/questions/24094476/python-pandas-to-r-dataframe
@@ -135,6 +142,7 @@ if write_csv:
 # NOTE: This requires feather: pip-install feather-format as well as pandas >= v0.20.0
 
 Trimmed_Age.reset_index().to_feather(person_wd + "AMELIA.feather") # Index reset is requirement for export
+Holdout.reset_index().to_feather(person_wd + "Holdout.feather")
 =======
 Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
 >>>>>>> 382c9454c8f38ce05995d2923a1ac2178346ab96
