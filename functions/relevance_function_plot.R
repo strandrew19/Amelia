@@ -1,20 +1,17 @@
-plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, show_mean, show_median, sample_type, plot_relevance){
+plot_income_diff <- function(sample_data, amelia, show_mean, show_median, sample_type, plot_relevance){
   #' This function is used to show the difference in income between the sample and the 
   #' actual distribution in the AMELIA dataset.
   #' 
   #' INPUT
-  #'   - sample_data: Output value of compute_income_diff()
-  #'   - amelia: Income distribution of original AMELIA dataset with bucket size 
-  #'   - bucket_size: Size of buckets, used for binwith
-  #'   - label_distance: Each i-th label will be displayed in the plot
-  #'   - padding: By how much the relevance function has been padded (i.e. by how much the min/max differ from [0,1])
-  #'   - show_mean: Whether mean should be plotted as a horizontal line
-  #'   - show_median: Whether median should be plotted as a horizontal line
-  #'   - sample_type: Implemented sampling method, gets added to the title if not null
+  #'   - sample_data = Output value of compute_income_diff()
+  #'   - amelia      = Income distribution of original AMELIA dataset with bucket size 
+  #'   - padding     = By how much the relevance function has been padded (i.e. by how much the min/max differ from [0,1])
+  #'   - show_mean   = Whether mean should be plotted as a horizontal line
+  #'   - show_median = Whether median should be plotted as a horizontal line
+  #'   - sample_type = Implemented sampling method, gets added to the title if not null
   #' 
   #' OUTPUT
   #'   - Histogram of density of distributions + plot of difference
-  #'   
   
   plot_data <- data.frame(
     "sample_dist" = as.numeric(sample_data$dist_prop), 
@@ -26,13 +23,6 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, s
   
   
   plot_data$names <- factor(names(sample_data$dist_prop), levels = names(sample_data$dist_prop))
-  
-  # Plot labels 
-  labels <- rep("", times = nrow(plot_data))
-  
-  for (i in 1:length(labels)){
-    if ((i-1) %% label_distance == 0) labels[i] <- attributes(plot_data$names)$levels[i]
-  }
   
   ### Base plot (distributions) ###
   
@@ -55,23 +45,12 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, s
   # Adding the plot for the relevance function. This is done in single segments, which is pretty slow.
   
   if (plot_relevance){
-    for (i in 1:length(labels)){
+    for (i in 1:length(plot_data$diff)){
       plot <- plot + 
-        geom_segment(x = i-0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
-    }
-    
-    for (i in 1:length(labels)){
-      if (i < length(labels)){
-        plot <- plot + 
-          geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i+1])
-      } else {
-        plot <- plot + 
-          geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
-      }
+        geom_segment(aes(color = "Relevance Function"), x = i-0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
+      if (i < length(plot_data$diff)) plot <- plot + geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i+1])
       
     }
-    
-    
   }
   
   color <- c("Relevance Function" = "#3634CA")
@@ -103,12 +82,12 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, s
   
   plot <- plot +
     guides(fill = guide_legend(title=NULL), color = guide_legend(title=NULL)) +
-    scale_x_discrete(labels = labels) + 
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
-          axis.line = element_line(size = 0.2, colour = "black", linetype=1)) + 
+          axis.line = element_line(size = 0.2, colour = "black", linetype=1),
+          panel.background = element_rect(fill = 'white', colour = 'white')) + 
     ggtitle(label = title,
             subtitle = subtitle) +
-    labs(x = "Income", y = "Density") 
+    labs(x = "Income", y = "Density")
   
   
   print(plot)
