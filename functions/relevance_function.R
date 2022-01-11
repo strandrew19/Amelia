@@ -1,15 +1,26 @@
 library(ggplot2)
 rescale <- scales::rescale
 
+<<<<<<< HEAD
 get_bucket_dist <- function(x, bucket_size, max_val = 1034300){
+=======
+get_bucket_dist <- function(x, buckets, AMELIA = F, max_val = NULL, bucket_size = NULL){
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   #' This function computes the buckets for a given income sample, which is needed to compare it 
   #' to the known information about the income distribution of the full dataset.
   #' 
   #' INPUTs
   #'   - x           = income of sample
+<<<<<<< HEAD
   #'   - bucket_size = size of outgoing buckets, should be set once and always kept constant
   #'   - max_val     = maximum income in AMELIA dataset (to ensure that we always have same amount 
   #'                   of categories)
+=======
+  #'   - buckets     = vector of buckets based on AMELIA dataset
+  #'   - AMELIA      = T/F variable, indicates whether buckets on original AMELIA data are computed
+  #'   - max_val     = maximum income value, only relevant if AMELIA == T
+  #'   - bucket_size = size of income buckets, only relevant if AMELIA == T
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   #'  
   #'  OUTPUT
   #'    - a list with
@@ -17,10 +28,19 @@ get_bucket_dist <- function(x, bucket_size, max_val = 1034300){
   #'      - the proportion of people per income class (prop.table)
   
   
+<<<<<<< HEAD
   min <- 0
   max <- max_val + bucket_size
   
   buckets <- seq(min, max, bucket_size)
+=======
+  if (AMELIA){
+    min <- 0
+    max <- max_val + bucket_size
+    
+    buckets <- seq(min, max, bucket_size)
+  }
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   
   dist_val <- table(cut(x, breaks = buckets, include.lowest = T))
   dist_prop <- prop.table(dist_val)
@@ -28,7 +48,11 @@ get_bucket_dist <- function(x, bucket_size, max_val = 1034300){
   return(list("dist_val" = dist_val, "dist_prop" = dist_prop))
 }
 
+<<<<<<< HEAD
 plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, padding, show_mean, show_median){
+=======
+plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance){
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   #' This function is used to show the difference in income between the sample and the 
   #' actual distribution in the AMELIA dataset.
   #' 
@@ -40,6 +64,10 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
   #'   - padding: By how much the relevance function has been padded (i.e. by how much the min/max differ from [0,1])
   #'   - show_mean: Whether mean should be plotted as a horizontal line
   #'   - show_median: Whether median should be plotted as a horizontal line
+<<<<<<< HEAD
+=======
+  #'   - sample_type: Implemented sampling method, gets added to the title if not null
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   #' 
   #' OUTPUT
   #'   - Histogram of density of distributions + plot of difference
@@ -84,6 +112,7 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
   
   # Adding the plot for the relevance function. This is done in single segments, which is pretty slow.
   
+<<<<<<< HEAD
   for (i in 1:length(labels)){
     plot <- plot + 
       geom_segment(x = i-0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
@@ -98,10 +127,34 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
         geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
     }
     
+=======
+  if (plot_relevance){
+    for (i in 1:length(labels)){
+      plot <- plot + 
+        geom_segment(x = i-0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
+    }
+    
+    for (i in 1:length(labels)){
+      if (i < length(labels)){
+        plot <- plot + 
+          geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i+1])
+      } else {
+        plot <- plot + 
+          geom_segment(aes(color = "Relevance Function"), x = i+0.5, xend = i+0.5, y = plot_data$diff[i], yend = plot_data$diff[i])
+      }
+      
+    }
+    
+    
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   }
   
   color <- c("Relevance Function" = "#3634CA")
   
+<<<<<<< HEAD
+=======
+  
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   # Mean / Median
   if (show_mean){
     plot <- plot + geom_hline(aes(yintercept = mean(plot_data$diff), color = "Mean"), lty = "dashed")
@@ -116,28 +169,54 @@ plot_income_diff <- function(sample_data, amelia, bucket_size, label_distance, p
   
   ### Theme ###
   
+<<<<<<< HEAD
   title = "Income distribution in sample and true population with resulting relevance function"
   
   if (padding != 0) subtitle = sprintf("Relevance function with padding of %s has been scaled to range between 0 and maximum density value", padding)
   else subtitle = "Relevance function has been scaled to range between 0 and maximum density value"
+=======
+  if (!is.null(sample_type)){
+    title <- sprintf("Income distribution in %s sample and true population with resulting relevance function", sample_type)
+  } else {
+    title <- "Income distribution in sample and true population with resulting relevance function"
+  }
+  
+  
+  if (padding != 0) subtitle <- sprintf("Relevance function with padding of %s has been scaled to range between 0 and maximum density value", padding)
+  else subtitle <- "Relevance function has been scaled to range between 0 and maximum density value"
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   
   
   plot <- plot +
     guides(fill = guide_legend(title=NULL), color = guide_legend(title=NULL)) +
     scale_x_discrete(labels = labels) + 
+<<<<<<< HEAD
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
     ggtitle(label = title,
             subtitle = subtitle) +
     labs(x = "Income", y = "Density")
+=======
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+          axis.line = element_line(size = 0.2, colour = "black", linetype=1)) + 
+    ggtitle(label = title,
+            subtitle = subtitle) +
+    labs(x = "Income", y = "Density") 
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
     
   
   print(plot)
 }
 
 
+<<<<<<< HEAD
 compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
                                 padding = 0, damp = "pop",
                                 plot = T, label_distance = 10, show_mean = F, show_median = F){
+=======
+compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, max_val, 
+                                padding = 0, damp = "pop",
+                                plot = F, label_distance = 10, show_mean = F, show_median = F, sample_type = NULL, plot_relevance = F){
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   #' This function is a wrapper for all the other function in this file. Note that we use the 'dist_prop'
   #' attribute for the difference as this is a measure that has been adjusted by the sample size. If 
   #' we were to use absolute values, we wouldn't get relevant results as the N for AMELIA is too large.
@@ -151,7 +230,13 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size,
   #' INPUT
   #'   - sample_income      = Vector containing the income values of all the people in the sample
   #'   - amelia_income_dist = Distribution of the AMELIA income in buckets, i.e. the output 
+<<<<<<< HEAD
   #'                          of the get_bucket_dist function for the full AMELIA dataset
+=======
+  #'                          of the get_bucket_dist function for the full AMELIA dataset.
+  #'   - bucket_size        = Size of income buckets in information about AMELIA full population
+  #'   - max                = maximum income in AMELIA dataset
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   #'   - padding            = Potential padding of the relevance, ranges between 0 and 0.5.
   #'                          Determines how much smaller than 0/1 the min/max values are. 
   #'   - damp               = Specifies the density that should be used for dampening the relevance function. 
@@ -160,6 +245,10 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size,
   #'   - label_distance     = Distance between labels, only used for plotting
   #'   - show_mean          = Whether the (scaled) mean should be shown in the plot as a threshold
   #'   - show_median        = Whether the (scaled) median should be shown in the plot as a threshold
+<<<<<<< HEAD
+=======
+  #'   - sample_type        = Sampling method used, only used for the title of the plot
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   #'   
   #' 
   #' OUTPUT
@@ -171,31 +260,78 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size,
   #'     - scaled_difference_table = Difference table with scaled values 
   #'     - relevance_table         = Difference in table form with dampening to counteract group size
   #'     - scaled_relevance_table  = Relevance table with scaled values
+<<<<<<< HEAD
   #'     - relevance_threshold     = Suggested threshold values for relevance function. Contains mean and
   #'                                 median of the scaled relevance function as a list.
   
   sample_income_dist <- get_bucket_dist(sample_income, bucket_size = bucket_size)
+=======
+  #'     - relevance_matrix_ubl    = Relevance in correct form for functions in UBL package
+  #'     - relevance_threshold     = Suggested threshold values for relevance function. Contains mean and
+  #'                                 median of the scaled relevance function as a list.
+  
+  min <- 0
+  max <- max_val + bucket_size
+  
+  buckets <- seq(min, max, bucket_size)
+  
+  sample_income_dist <- get_bucket_dist(sample_income, buckets = buckets)
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   
   if (tolower(damp) == "pop") dampening <- 1 - amelia_income_dist$dist_prop
   else if (tolower(damp) == "sample") dampening <- 1 - sample_income_dist$dist_prop
   else{
+<<<<<<< HEAD
     print("Input for 'damp' must be either 'sample' or 'pop'. Defaulting to 'pop'.")
+=======
+    message("Input for 'damp' must be either 'sample' or 'pop'. Defaulting to 'pop'.")
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
     dampening <- 1 - amelia_income_dist$dist_prop
   }
   
   diff <- (amelia_income_dist$dist_prop - sample_income_dist$dist_prop)
+<<<<<<< HEAD
+=======
+  diff_numeric <- as.numeric(diff)
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   relevance <- diff * dampening
   
   # Apply rescaling as UBL relevance function ~ [0,1] and convert back to table
   min <- 0 + padding
   max <- 1 - padding
   
+<<<<<<< HEAD
   diff_scaled <- as.table(rescale(as.numeric(diff), to = c(min, max)))
   relevance_scaled <- as.table(rescale(as.numeric(diff), to = c(min, max)))
+=======
+  diff_scaled <- as.table(rescale(diff_numeric, to = c(min, max)))
+  relevance_scaled <- as.table(rescale(diff_numeric, to = c(min, max)))
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   
   names(diff_scaled) <- names(sample_income_dist$dist_prop)
   names(relevance_scaled) <- names(sample_income_dist$dist_prop)
   
+<<<<<<< HEAD
+=======
+  # Create matrix for UBL functions 
+  # Shape: x, phi(x), phi'(x)
+
+  # To get phi'(x): Spline interpolation and get first derivative
+  fun <- splinefun(x = buckets[1:length(buckets)-1], y = as.numeric(relevance_scaled))
+  
+  
+  relevance_deriv_per_bucket <- fun(x = buckets[1:length(buckets)-1], deriv = 1)
+  
+  relevance_matrix_ubl <- matrix(
+    cbind(
+      buckets[1:length(buckets)-1] + 1/2 * bucket_size, # Mean of each bucket as sampling point 
+      as.numeric(relevance_scaled), 
+      relevance_deriv_per_bucket), 
+    ncol = 3)
+  
+  
+  
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   # Suggested Threshold for relevance function: Median of relevance function
   threshold_mean <- mean(as.numeric(relevance_scaled))
   threshold_med <- median(as.numeric(relevance_scaled))
@@ -207,10 +343,18 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size,
     "scaled_difference_table" = diff_scaled,
     "relevance_table" = relevance, 
     "scaled_relevance_table" = relevance_scaled,
+<<<<<<< HEAD
     "relevance_threshold" = list("mean" = threshold_mean,
                                  "median" = threshold_med))
   
   if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, padding, show_mean, show_median)
+=======
+    "relevance_matrix_ubl" = relevance_matrix_ubl,
+    "relevance_threshold" = list("mean" = threshold_mean,
+                                 "median" = threshold_med))
+  
+  if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, padding, show_mean, show_median, sample_type, plot_relevance)
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
   
   return(all_vals)
 }
