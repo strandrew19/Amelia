@@ -134,7 +134,10 @@ print("### Exporting ###")
 write_csv = False
 if write_csv:
     Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
+<<<<<<< HEAD
+=======
     Holdout.to_csv(f"{person_wd}/Holdout_Amelia_Dataset.csv")
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
 
 # Export to Feather for faster R import
 # Source: https://stackoverflow.com/questions/24094476/python-pandas-to-r-dataframe
@@ -142,7 +145,10 @@ if write_csv:
 # NOTE: This requires feather: pip-install feather-format as well as pandas >= v0.20.0
 
 Trimmed_Age.reset_index().to_feather(person_wd + "AMELIA.feather") # Index reset is requirement for export
+<<<<<<< HEAD
+=======
 Holdout.reset_index().to_feather(person_wd + "Holdout.feather")
+>>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
 =======
 Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
 >>>>>>> 382c9454c8f38ce05995d2923a1ac2178346ab96
