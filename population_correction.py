@@ -3,8 +3,7 @@ import pyreadr
 import pandas as pd
 from tqdm import tqdm
 
-person_wd = os.getcwd() + "\\AMELIA\\AMELIA_P_level_v0.2.3 (Person-Level)\\AMELIA_P_level_v0.2.3\\"
-# person_wd = r"C:\Users\David\Documents\Uni\02 Data Science\03 Wise 21-22\Research Case Studies\AMELIA\AMELIA_P_level_v0.2.3"
+person_wd =  os.path.dirname(__file__) + "/data/AMELIA_P_level_v0.2.3/"
 print(person_wd)
 
 AMELIA = pd.DataFrame()
@@ -22,7 +21,7 @@ def readr(inp_name, out_cname, wd = person_wd):
 
     fname = f"PAML.{inp_name}_v0.2.3.RData"
 
-    temp = pyreadr.read_r(f"{wd}/{fname}")
+    temp = pyreadr.read_r(f"{wd}{fname}")[inp_name]
     AMELIA[out_cname] = temp[inp_name]
 
 files = {
@@ -130,7 +129,7 @@ print("### Exporting ###")
 # Export to Feather for faster R import
 # Source: https://stackoverflow.com/questions/24094476/python-pandas-to-r-dataframe
 
-# NOTE: This requires feather: pip-install feather-format as well as pandas >= v0.20.0
+# NOTE: This requires feather: pip install feather-format as well as pandas >= v0.20.0
 
-Trimmed_Age.reset_index().to_feather(person_wd + "AMELIA.feather") # Index reset is requirement for export
-Holdout.reset_index().to_feather(person_wd + "Holdout.feather")
+Trimmed_Age.reset_index().to_feather(f"{person_wd}/../AMELIA.feather") # Index reset is requirement for export
+Holdout.reset_index().to_feather(f"{person_wd}/../Holdout.feather")
