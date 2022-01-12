@@ -13,15 +13,16 @@ source("functions/sampling_correction.R")
 ##### Get reference values (i.e. 'true' population values) ##### 
 
 # Set bucket size for comparison between values 
-BUCKET_SIZE <- 5000
-formals(compute_income_diff)$bucket_size <- BUCKET_SIZE # Set as global preset
 
-# Get maximum income 
-MAX <- max(amelia_full_income)
-formals(compute_income_diff)$max_val <- MAX
+# Source: https://unstats.un.org/unsd/demographic/sources/census/quest/NZL2013enIn.pdf
+BUCKETS <- c(seq(0, 40000, by = 5000), seq(50000, 70000, by = 10000), 100000, 150000, max(amelia_full_income)+1)
+formals(compute_income_diff)$buckets <- BUCKETS # Set as global preset
+formals(importance_sample)$buckets <- BUCKETS
+formals(synth_sample)$buckets <- BUCKETS
 
 #### Computing true buckets #####
-AMELIA_BUCKET_INCOME <- get_bucket_dist(amelia_full_income, AMELIA = T, max_val = MAX, bucket_size = BUCKET_SIZE)
+AMELIA_BUCKET_INCOME <- get_bucket_dist(amelia_full_income, buckets = BUCKETS)
+
 formals(compute_income_diff)$amelia_income_dist <- AMELIA_BUCKET_INCOME # Set as global preset
 formals(importance_sample)$amelia_buckets <- AMELIA_BUCKET_INCOME
 formals(synth_sample)$amelia_buckets <- AMELIA_BUCKET_INCOME
@@ -43,7 +44,7 @@ for (file in FILENAMES){
     resample_data$Sex <- as.factor(resample_data$Sex)
 
     # Base error
-    income_difference <- compute_income_diff(resample_data$Person_Income)
+    income_difference <- compute_income_diff(resample_data$Person_Income, plot = T, plot_relevance = T)
     print(sprintf("Base Sample difference: %.6f", income_difference$squared_deviation))
     
     # Importance Sampling
@@ -55,9 +56,9 @@ for (file in FILENAMES){
     current_sample[[method]]$synthetic_sampling <- synth_sample(income_difference, data = resample_data, k = 3, print_cases = F)
     synth_samp_error <- compute_income_diff(current_sample[[method]]$synthetic_sampling$Person_Income, return_full = F)
     print(sprintf("Synthetic sampling difference: %.6f", imp_samp_error))
-    
-    # Save
-    filename <- sprintf("data/samples/%s", file)
-    saveRDS(current_sample, filename)
   }
+  
+  # Save
+  filename <- sprintf("data/samples/%s", file)
+  saveRDS(current_sample, filename)
 }

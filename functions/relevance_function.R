@@ -2,7 +2,7 @@ library(ggplot2)
 
 rescale <- scales::rescale
 
-get_bucket_dist <- function(x, buckets, AMELIA = F, max_val = NULL, bucket_size = NULL){
+get_bucket_dist <- function(x, buckets){
   #' This function computes the buckets for a given income sample, which is needed to compare it 
   #' to the known information about the income distribution of the full dataset.
   #' 
@@ -18,22 +18,14 @@ get_bucket_dist <- function(x, buckets, AMELIA = F, max_val = NULL, bucket_size 
   #'      - amount people per income class (table) 
   #'      - the proportion of people per income class (prop.table)
   
-  
-  if (AMELIA){
-    min <- 0
-    max <- max_val + bucket_size
-    
-    buckets <- seq(min, max, bucket_size)
-  }
-  
   dist_val <- table(cut(x, breaks = buckets, include.lowest = T))
   dist_prop <- prop.table(dist_val)
   
   return(list("dist_val" = dist_val, "dist_prop" = dist_prop))
 }
 
-compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, max_val,
-                                plot = F, label_distance = 10, show_mean = F, show_median = F, sample_type = NULL, plot_relevance = F,
+compute_income_diff <- function(sample_income, amelia_income_dist, buckets, 
+                                plot = F, show_mean = F, show_median = F, sample_type = NULL, plot_relevance = F,
                                 return_full = T){
   #' This function is a wrapper for all the other function in this file. Note that we use the 'dist_prop'
   #' attribute for the difference as this is a measure that has been adjusted by the sample size. If 
@@ -49,12 +41,7 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   #'   - sample_income      = Vector containing the income values of all the people in the sample
   #'   - amelia_income_dist = Distribution of the AMELIA income in buckets, i.e. the output 
   #'                          of the get_bucket_dist function for the full AMELIA dataset.
-  #'   - bucket_size        = Size of income buckets in information about AMELIA full population
-  #'   - max                = maximum income in AMELIA dataset
-  #'   - padding            = Potential padding of the relevance, ranges between 0 and 0.5.
-  #'                          Determines how much smaller than 0/1 the min/max values are. 
-  #'   - damp               = Specifies the density that should be used for dampening the relevance function. 
-  #'                          Can be either "sample" or "pop", if anything else is entered it defaults to pop.
+  #'   - buckets            = Set vector of income buckets
   #'   - plot               = Whether plot should be generated
   #'   - label_distance     = Distance between labels, only used for plotting
   #'   - show_mean          = Whether the (scaled) mean should be shown in the plot as a threshold
@@ -67,10 +54,8 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   #'   - If (return_full == TRUE)
   #'     - List consisting of the difference between the 'true' income in buckets and the sampled
   #'       income in buckets in three forms:
-  #'       - buckets                      = Buckets for given bucket_size
   #'       - dist_val                     = Absolute # of people in sample per bucket
   #'       - dist_prop                    = Proportion of people in sample per bucket
-  #'       - difference_table_abs         = Difference in table form (absolute values)
   #'       - difference_table_prop        = Difference in table form (used for analysis of sampling methods)
   #'       - difference_table_prop_scaled = Difference table with scaled values (range = 0,1)
   #'       - squared_deviation            = Squared deviation of density per bucket in the sample and true 
@@ -78,12 +63,9 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   #'   - Else
   #'       - squared_deviation            = Squared deviation of density per bucket in the sample and true 
   #'                                        distribution
-
-  buckets <- seq(0, max_val + bucket_size, bucket_size)
   
-  sample_income_dist <- get_bucket_dist(sample_income, buckets = buckets)
+  sample_income_dist <- get_bucket_dist(sample_income, buckets)
   
-  diff_abs <- (amelia_income_dist$dist_val - sample_income_dist$dist_val)
   diff_prop <- (amelia_income_dist$dist_prop - sample_income_dist$dist_prop)
   diff_numeric <- as.numeric(diff_prop)
   
@@ -94,17 +76,14 @@ compute_income_diff <- function(sample_income, amelia_income_dist, bucket_size, 
   squared_deviation <- sum(as.numeric(diff_prop)^2)
   
   all_vals <- list(
-    "buckets" = buckets,
     "dist_val" = sample_income_dist$dist_val,
     "dist_prop" = sample_income_dist$dist_prop,
-    "difference_table_val" = diff_abs,
     "difference_table_prop" = diff_prop, 
     "difference_table_prop_scaled" = diff_scaled,
     "squared_deviation" = squared_deviation)
   
-  if(plot) plot_income_diff(all_vals, amelia_income_dist, bucket_size, label_distance, show_mean, show_median, sample_type, plot_relevance)
+  if(plot) plot_income_diff(all_vals, amelia_income_dist, show_mean, show_median, sample_type, plot_relevance)
   
   
-  if(return_full) return(all_vals)
-  else return(squared_deviation)
+  ifelse(return_full, return(all_vals), return(squared_deviation))
 }

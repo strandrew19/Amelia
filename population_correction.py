@@ -3,12 +3,8 @@ import pyreadr
 import pandas as pd
 from tqdm import tqdm
 
-person_wd = os.getcwd() + "\\AMELIA\\AMELIA_P_level_v0.2.3 (Person-Level)\\AMELIA_P_level_v0.2.3\\"
-<<<<<<< HEAD
-# person_wd = r"C:\Users\David\Documents\Uni\02 Data Science\03 Wise 21-22\Research Case Studies\AMELIA\AMELIA_P_level_v0.2.3"
+person_wd =  os.path.dirname(__file__) + "/data/AMELIA_P_level_v0.2.3/"
 print(person_wd)
-=======
->>>>>>> 382c9454c8f38ce05995d2923a1ac2178346ab96
 
 AMELIA = pd.DataFrame()
 
@@ -25,7 +21,7 @@ def readr(inp_name, out_cname, wd = person_wd):
 
     fname = f"PAML.{inp_name}_v0.2.3.RData"
 
-    temp = pyreadr.read_r(f"{wd}/{fname}")
+    temp = pyreadr.read_r(f"{wd}{fname}")[inp_name]
     AMELIA[out_cname] = temp[inp_name]
 
 files = {
@@ -129,26 +125,11 @@ Trimmed_Age = Trimmed_Age.drop(Holdout.index)
 
 # Export to CSV file
 print("### Exporting ###")
-<<<<<<< HEAD
-
-write_csv = False
-if write_csv:
-    Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
-<<<<<<< HEAD
-=======
-    Holdout.to_csv(f"{person_wd}/Holdout_Amelia_Dataset.csv")
->>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
 
 # Export to Feather for faster R import
 # Source: https://stackoverflow.com/questions/24094476/python-pandas-to-r-dataframe
 
-# NOTE: This requires feather: pip-install feather-format as well as pandas >= v0.20.0
+# NOTE: This requires feather: pip install feather-format as well as pandas >= v0.20.0
 
-Trimmed_Age.reset_index().to_feather(person_wd + "AMELIA.feather") # Index reset is requirement for export
-<<<<<<< HEAD
-=======
-Holdout.reset_index().to_feather(person_wd + "Holdout.feather")
->>>>>>> 8535ee84833ad5060e140d119064554b4aad0b4c
-=======
-Trimmed_Age.to_csv(f"{person_wd}/Cleaned_Amelia_Dataset.csv")
->>>>>>> 382c9454c8f38ce05995d2923a1ac2178346ab96
+Trimmed_Age.reset_index().to_feather(f"{person_wd}/../AMELIA.feather") # Index reset is requirement for export
+Holdout.reset_index().to_feather(f"{person_wd}/../Holdout.feather")

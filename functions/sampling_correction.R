@@ -3,7 +3,7 @@ library(FNN)
 
 ##### Importance Sampling ######
 
-importance_sample <- function(sample_diff, amelia_buckets, data, print_cases = T){
+importance_sample <- function(sample_diff, amelia_buckets, buckets, data, print_cases = T){
   #' Function to perform under- and oversampling per income buckets. 
   #' Since the density for lower income buckets is much higher than for higher income buckets, we
   #' need to put more emphasis on smaller differences in higher income buckets. For this, we 
@@ -14,13 +14,13 @@ importance_sample <- function(sample_diff, amelia_buckets, data, print_cases = T
   #'   - sample_diff    = List object from compute_income_diff
   #'   - amelia_buckets = Density of each income bucket in full AMELIA dataset, used for scaling
   #'                      the density per bucket 
+  #'   - buckets        = Income buckets
   #'   - data           = Sample data to modify
   #'   - print_cases    = Whether function should print # of replacements per bucket
   #' 
   #' OUTPUT
   #'   - resample_data = data with added/removed data points
   
-  buckets <- sample_diff$buckets
   proportions <- as.numeric(sample_diff$difference_table_prop)
 
   
@@ -41,11 +41,7 @@ importance_sample <- function(sample_diff, amelia_buckets, data, print_cases = T
   
     # Select amount of necessary over/undersampling based on scaled proportional difference
     sample_proportion <- proportions[i]
-    
-    #' If there is zero people in a bucket, the scaling returns NaN. In these cases, simply correct
-    #' the sampling proportion to 0.
-    if(is.nan(sample_proportion)) sample_proportion <- 0
-    
+
     
     # Sample additional data    
     add_data <- slice_sample(sample_base, prop = abs(sample_proportion), replace = F)
@@ -66,7 +62,7 @@ importance_sample <- function(sample_diff, amelia_buckets, data, print_cases = T
 
 ##### Synthetic Oversampling #####
 
-synth_sample <- function(sample_diff, amelia_buckets, k = 4, data, print_cases = T){
+synth_sample <- function(sample_diff, data, amelia_buckets, buckets, k = 4, print_cases = T){
   #' Synthetically generate new data points using the kNN function from the FNN package. 
   #' Applies the same scaling of relevance to higher values, but does not generate any new 
   #' data points if there are less data points in the given cluster than new ones would 
@@ -77,27 +73,19 @@ synth_sample <- function(sample_diff, amelia_buckets, k = 4, data, print_cases =
   #'   - data           = Sample data to modify
   #'   - amelia_buckets = Density of each income bucket in full AMELIA dataset, used for scaling
   #'                      the density per bucket 
-  #'   - smoteR         = Whether or not kNN should be used to generate synthetic data points
+  #'   - buckets        = Income buckets
+  #'   - k              = # of neighbours to compare to
   #'   - print_cases    = Whether function should print # of replacements per bucket
   #' 
   #' OUTPUT
   #'   - resample_data = data with added/removed data points
-  
-  
-  buckets <- sample_diff$buckets                      
+                       
   proportions <- as.numeric(sample_diff$difference_table_prop)
-  
   
   # Scaling
   scale_factor <- 1/amelia_buckets$dist_prop
   proportions <- proportions * scale_factor
-  
-  #' If there is zero people in a bucket, the scaling returns NaN. In these cases, simply correct
-  #' the sampling proportion to 0.
-  for (i in 1:length(proportions)){
-    if(is.na(proportions[i]) | is.nan(proportions[i])) proportions[i] <- 0
-  }
-  
+
   # Since we do kNN, we can only add cases, i.e. shift s.t. lowest value == 0
   no_of_cases <- proportions * sample_diff$dist_val
   min_no_of_cases <- min(no_of_cases)
