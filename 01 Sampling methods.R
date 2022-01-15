@@ -3,7 +3,7 @@ require(arrow)
 require(splitstackshape)
 library(stringr)
 
-setwd("~/Uni/02 Data Science/03 Wise 21-22/Research Case Studies/Code/Amelia")
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 Amelia <- read_feather("data/Amelia.feather")
 
 # Remove any values that contain NA (important for sample correction methods)
