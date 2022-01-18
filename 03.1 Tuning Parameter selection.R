@@ -2,7 +2,11 @@
 "DATA PREPROCESSING"
 ####################
 
-
+library(tidyverse)
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+srs <- readRDS("data/samples/01_sample.rds")$SRS$Base
+  
+  
 # 1. Convert to numeric
 srs$Sex = as.numeric(as.factor(unique(srs$Sex)))
 
@@ -16,13 +20,17 @@ srs[,-1] = scale(srs[,-1], center = T) # scale everything except first column
 "TUNING PART"
 ####################
 
+library(caret)
+library(randomForest)
+
 "\\RANDOM FOREST"
-et.seed(123)
+set.seed(123)
 control = trainControl(method="repeatedcv", 
                        number=10, 
                        repeats=5, 
                        savePredictions = T,
-                       search = "grid")
+                       search = "grid",
+                       verboseIter = T)
 
 tunegrid = expand.grid(.mtry=c(1:15))
 
