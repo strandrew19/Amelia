@@ -33,9 +33,11 @@ FILENAMES <- str_pad(1:10, width = 2, pad = "0")
 FILENAMES <- paste0(FILENAMES, "_sample.rds", sep = "")
 
 SAMPLING_METHODS <- c("SRS", "Stratified", "Stratified Cluster")
+seed <- 1
 
 for (file in FILENAMES){
   print(sprintf("---------- %s ----------", file))
+  set.seed(seed)
   current_sample <- readRDS(sprintf("data/samples/%s", file))
   for (method in SAMPLING_METHODS){
     print(sprintf("### %s ####", method))
@@ -61,4 +63,6 @@ for (file in FILENAMES){
   # Save
   filename <- sprintf("data/samples/%s", file)
   saveRDS(current_sample, filename)
+  
+  seed <- seed + 1
 }
