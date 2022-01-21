@@ -13,7 +13,7 @@ srs$Sex = as.numeric(as.factor(unique(srs$Sex)))
 # 2. Scale data
 srs = srs %>%
   relocate(Person_Income) # move Y column to first position
-
+#To -2 
 srs[,-1] = scale(srs[,-1], center = T) # scale everything except first column
 
 ####################
