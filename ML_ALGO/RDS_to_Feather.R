@@ -13,15 +13,8 @@ for (i in c(1:10)){
   srs <- readRDS(paste0("0", i, "_sample.rds"))$SRS$Base
   importance <- readRDS(paste0("0", i, "_sample.rds"))$SRS$importance_sampling
   synthetic <- readRDS(paste0("0", i, "_sample.rds"))$SRS$synthetic_sampling
-  
-  # 1. Convert to numeric
-  srs$Sex = as.numeric(as.factor(unique(srs$Sex)))
-  
-  #This code cannot be implemented because of an internal R issue (Remedied in Python)
-  #importance$Sex = as.numeric(as.factor(unique(importance$Sex)))
-  #synthetic$Sex = as.numeric(as.factor(unique(synthetic$Sex)))
-  
-  # 2. Scale data
+ 
+  #Scale data
   srs = srs %>% relocate(Person_Income) # move Y column to first position
   importance = importance %>% relocate(Person_Income)
   synthetic = synthetic %>% relocate(Person_Income)
@@ -39,12 +32,7 @@ for (i in c(1:10)){
     srs <- readRDS(paste0(i, "_sample.rds"))$SRS$Base
     importance <- readRDS(paste0(i, "_sample.rds"))$SRS$importance_sampling
     synthetic <- readRDS(paste0(i, "_sample.rds"))$SRS$synthetic_sampling
-    
-    srs$Sex = as.numeric(as.factor(unique(srs$Sex)))
-    #same issue as above
-    #importance$Sex = as.numeric(as.factor(unique(importance$Sex)))
-    #synthetic$Sex = as.numeric(as.factor(unique(synthetic$Sex)))
-    
+       
     srs = srs %>% relocate(Person_Income) 
     importance = importance %>% relocate(Person_Income)
     synthetic = synthetic %>% relocate(Person_Income)
