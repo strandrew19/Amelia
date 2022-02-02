@@ -7,7 +7,6 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestRegressor
 
 top_wd = os.getcwd()
-print(top_wd)
 feather_dir = top_wd + "\\..\\data\\Feather Samples"
 
 os.chdir(feather_dir)
@@ -70,6 +69,11 @@ clf.fit(x_train,y_train.ravel())
 print("Best parameters set found on development set:")
 print(clf.best_params_)
 
+# Logging to text file to find w/o having to go through verbose statements
+with open(f"{top_wd}/MLPRegressor.txt", "w") as f:
+    f.write(f"Best parameters: \n {clf.best_params_} \n\n")
+    f.write(f"Best score: \n {clf.best_score_}")
+
 param_grid_rf = [
         {
             'n_estimators': ([1250, 1000, 750, 500]),
@@ -83,6 +87,9 @@ param_grid_rf = [
 regr = GridSearchCV(RandomForestRegressor(), param_grid_rf, cv=10, n_jobs = -1)
 regr.fit(x_train,y_train)
 
-
 print("Best parameters set found on development set:")
 print(regr.best_params_)
+
+with open(f"{top_wd}/RFRegressor.txt", "w") as f:
+    f.write(f"Best parameters: \n {regr.best_params_} \n\n")
+    f.write(f"Best score: \n {regr.best_score_}")
