@@ -72,7 +72,8 @@ print(clf.best_params_)
 # Logging to text file to find w/o having to go through verbose statements
 with open(f"{top_wd}/MLPRegressor.txt", "w") as f:
     f.write(f"Best parameters: \n {clf.best_params_} \n\n")
-    f.write(f"Best score: \n {clf.best_score_}")
+    f.write(f"Best score: \n {clf.best_score_} \n\n")
+    f.write(f"Full output: \n {clf.cv_results_}") # Can be imported as df
 
 param_grid_rf = [
         {
@@ -92,4 +93,5 @@ print(regr.best_params_)
 
 with open(f"{top_wd}/RFRegressor.txt", "w") as f:
     f.write(f"Best parameters: \n {regr.best_params_} \n\n")
-    f.write(f"Best score: \n {regr.best_score_}")
+    f.write(f"Best score: \n {regr.best_score_} \n\n")
+    f.write(f"Full output: \n {regr.cv_results_}") # Can be imported as df
