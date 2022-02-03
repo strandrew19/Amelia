@@ -111,7 +111,7 @@ regr = GridSearchCV(RandomForestRegressor(random_state=random_state),
                     cv=cv,
                     n_jobs=n_jobs,
                     refit='R2',
-                    verbose=2)
+                    verbose=10)
 regr.fit(x_train, y_train)
 
 print('Best parameters set found on development set:')
