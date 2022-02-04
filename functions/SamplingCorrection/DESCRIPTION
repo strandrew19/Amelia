@@ -1,0 +1,15 @@
+Package: SamplingCorrection
+Type: Package
+Title: Resampling data for RCS 2021/2022
+Version: 0.1.0
+Author: David Schischke
+Maintainer: David Schischke <s1ddschi@uni-trier.de>
+Description: Custom functionality to apply resampling based on a given density distribution. Designed for RCS WS 2021/2022: Complex sampling methods.
+Imports:
+  dplyr,
+  FNN,
+  ggplot2,
+  scales
+License: What license is it under?
+Encoding: UTF-8
+RoxygenNote: 7.1.2
