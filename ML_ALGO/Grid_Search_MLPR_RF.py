@@ -7,7 +7,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
 
 top_wd = os.getcwd()
-feather_dir = top_wd + '\\data\\Feather Samples'
+feather_dir = top_wd + '\\..\\data\\Feather Samples'
 
 os.chdir(feather_dir)
 AMELIA = pd.read_feather('01_SRS_Base_sample.feather')
