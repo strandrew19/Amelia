@@ -108,6 +108,6 @@ for (f in fnames){
   write_feather(holdout, sink = sprintf("%s/%s_%s_%s_LR_Holdout_results.feather", results_dir, split_name[1], split_name[2], split_name[3]))
 }
 
-write.csv(scores, file = sprintf("%s/scores.csv", results_dir), sep = ";" )
-write.csv(scores_holdout, file = sprintf("%s/scores_holdout.csv", results_dir), sep = ";" )
+write.csv2(scores, file = sprintf("%s/scores.csv", results_dir), row.names = F)
+write.csv2(scores_holdout, file = sprintf("%s/scores_holdout.csv", results_dir), row.names = F)
 
