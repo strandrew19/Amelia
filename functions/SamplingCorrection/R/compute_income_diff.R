@@ -13,7 +13,7 @@
 #' @importFrom scales rescale
 #'
 #' @param sample_income Vector containing the income values of all the people in the sample
-#' @param Distribution of the AMELIA income in buckets, i.e. the output of the get_bucket_dist function for the full AMELIA dataset.
+#' @param amelia_income_dist Distribution of the AMELIA income in buckets, i.e. the output of the get_bucket_dist function for the full AMELIA dataset.
 #' @param buckets Set vector of income buckets
 #' @param plot Whether plot should be generated
 #' @param label_distance Distance between labels, only used for plotting
