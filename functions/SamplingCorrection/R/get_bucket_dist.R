@@ -10,8 +10,7 @@
 #'
 #' @export
 
-get_bucket_dist <- function(x, buckets){
-
+get_bucket_dist <- function(x, buckets) {
   dist_val <- table(cut(x, breaks = buckets, include.lowest = T))
   dist_prop <- prop.table(dist_val)
 

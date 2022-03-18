@@ -28,7 +28,7 @@ Strata <- c("1" = 1834, "2" = 7343, "3" = 15315, "4" =14625,
             "5" = 11904, "6" = 3391, "7" = 9763, "8" =8739, 
             "9" = 7358, "10" = 12563, "11" = 7165)
 
-#Draw Largest Cluster in each stratum for total size of 10,000
+#Draw Largest Cluster in each stratum for total size of 100,000
 Clusters <- c("4", "5", "10", "12", "19", "23", "27", "29", 
               "34", "38", "40")
 

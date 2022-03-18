@@ -38,7 +38,7 @@ reg_plot_base <- function(method, oos = F){
     ylab(TeX("$R^2$")) + 
     ylim(c(min(filter(long, Regression == method)$value), max(filter(long, Regression == method)$value)))
   
-  fname <- ifelse(oos, sprintf("%s_OOS_nocorr.png", method), sprintf("%s_IS_nocorr.png", method))
+  
   ggsave(sprintf("%s/visualizations/results graphics/regression/%s", wd, fname), plot = p, width = 12, height = 7)
 }
 
@@ -53,13 +53,14 @@ reg_plot_corr <- function(method, oos = F){
     ylab(TeX("$R^2$")) + 
     ylim(c(min(filter(long, Regression == method)$value), max(filter(long, Regression == method)$value)))
   
+  fname <- ifelse(oos, sprintf("%s_OOS.png", method), sprintf("%s_IS.png", method))
   ggsave(sprintf("%s/visualizations/results graphics/regression/%s", wd, fname), plot = p, width = 12, height = 7)
 }
 
 for (method in c("LR", "RF", "NN")){
   for (oos in c(T, F)){
     reg_plot_base(method, oos)
-    reg_plot_corr(method, oos = T)
+    reg_plot_corr(method, oos)
   }
 }
 
@@ -99,29 +100,6 @@ for (method in c("SRS", "StRS", "StCRS")){
   for (oos in c(T, F)){
     samp_plot_base(method, oos)
     samp_plot_corr(method, oos)
-  }
-}
-
-##### Correction-wise comparison ##### 
-
-corr_plot <- function(method, oos = F){
-  p <- ggplot(filter(long, Regression == method, sample == ifelse(oos, "Out of Sample", "In-Sample")), aes(x = Correction, y = value, fill = Sample))+
-    geom_boxplot(outlier.shape = NA) + 
-    geom_jitter(position = position_jitterdodge(jitter.width = 0.2), alpha = 0.3, pch = 19) + 
-    theme_minimal() + 
-    ggsci::scale_fill_tron() +
-    guides(fill = guide_legend(title = "Sampling method")) + 
-    xlab("Correction method") + 
-    ylab(TeX("$R^2$")) + 
-    ylim(c(min(filter(long, Regression == method)$value), max(filter(long, Regression == method)$value)))
-  
-  fname <- ifelse(oos, sprintf("%s_OOS.png", method), sprintf("%s_IS.png", method))
-  ggsave(sprintf("%s/visualizations/results graphics/regression/%s", wd, fname), plot = p, width = 12, height = 7)
-}
-
-for (method in c("LR", "RF", "NN")){
-  for (oos in c(T, F)){
-    corr_plot(method, oos)
   }
 }
 
@@ -185,7 +163,27 @@ p <- ggplot(vals, aes(x = iter, y = sd, col = sample, group = sample)) +
 
 ggsave(sprintf("%s/visualizations/results graphics/holdout_sd.png", wd), plot = p, width = 12, height = 8)
 
-#### Additional relevant values for text
+#### Additional relevant values for Appendix
+
+long %>% 
+  filter(sample == "In-Sample") %>%
+  pivot_wider(names_from = X, values_from = value) %>%
+  select(-sample) %>% 
+  mutate_if(is.numeric, function(x) round(x,4)) %>%
+  write.csv2(file = sprintf("%s/visualizations/IS_vals_appendix.csv", wd))
+
+long %>% 
+  filter(sample == "Out of Sample") %>%
+  pivot_wider(names_from = X, values_from = value) %>%
+  select(-sample) %>% 
+  mutate_if(is.numeric, function(x) round(x,4)) %>%
+  write.csv2(file = sprintf("%s/visualizations/OOS_vals_appendix.csv", wd))
+
+#### Other stuff
+
+
+mean(filter(long, Regression == "LR", sample == "Out of Sample", Sample == "StCRS", Correction == "No correction")$value)
+mean(filter(long, Regression == "LR", sample == "In-Sample", Sample == "StCRS", Correction == "No correction")$value)
 
 filter(long, Regression == "NN", sample == "Out of Sample", Sample == "StCRS", Correction == "No correction")
 
@@ -201,15 +199,3 @@ max(filter(long, Regression == "RF", Correction == "No correction")$value)
 mean(filter(long, Regression == "RF", Correction == "No correction", Sample == "SRS")$value)
 mean(filter(long, Regression == "RF", Correction == "No correction", Sample == "StRS")$value)
 mean(filter(long, Regression == "RF", Correction == "No correction", Sample == "StCRS")$value)
-
-
-
-
-
-
-
-method <- "LR"
-
-
-
-
