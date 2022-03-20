@@ -4,7 +4,7 @@ setwd(wd)
 library(arrow)
 library(dplyr)
 library(stringr)
-devtools::load_all("functions/SamplingCorrection")
+devtools::load_all("SamplingCorrection")
 
 amelia_full_income <- read_feather(sprintf("%s/data/AMELIA.feather", wd))$Person_Income
 
