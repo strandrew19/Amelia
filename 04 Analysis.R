@@ -110,6 +110,12 @@ vals$regression <- factor(vals$regression, labels = c("LR", "NN", "RF"))
 vals$correction <- factor(vals$correction, labels = c("No correction", "Importance", "Synthetic"))
 vals$sample <- factor(vals$sample, labels = c("SRS", "StRS", "StCRS"))
 
+means <- pivot_wider(select(vals, - sd), names_from = iter, values_from = value) %>% mutate_if(is.numeric, function(x) round(x, 2) %>% as.character(x))
+write.csv(means, sprintf("%s/visualizations/mean_pred.csv", wd))
+
+sds <- pivot_wider(select(vals, - value), names_from = iter, values_from = sd) %>% mutate_if(is.numeric, function(x) round(x, 2) %>% as.character(x))
+write.csv(sds, sprintf("%s/visualizations/sd_pred.csv", wd))
+
 p <- ggplot(vals, aes(x = iter, y = value, col = sample, group = sample)) + 
   geom_point(size = 2) + geom_line(size = 1) + 
   #geom_errorbar(aes(ymin = value - sd, ymax = value + sd, alpha = 0.1)) + 
